@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Phoenix Content Portal</title>
+    <link rel="stylesheet" href="/static/pure-min-0.6.0.css">
+    <link rel="stylesheet" href="/static/site.css">
+</head>
+<body>
+<div class="menu">
+<div class="pure-menu pure-menu-horizontal">
+<a href="/" class="pure-menu-heading pure-menu-link">Content Portal</a>
+<ul class="menu-list pure-menu-list">
+<li class="pure-menu-item"><a href="/envs/{{ tag }}/pipelines/cp" class="pure-menu-link">Content Pipeline</a></li>
+<li class="pure-menu-item"><a href="/envs/{{ tag }}/pipelines/iibe" class="pure-menu-link">IIBE ETL Pipeline</a></li>
+<li class="pure-menu-item"><a href="/envs/{{ tag }}/pipelines/dv" class="pure-menu-link">DV ETL Pipeline</a></li>
+</div>
+</div>
+<div class="main-content">
+{% if items %}
+{% for item in items %}
+<div>
+<h1>Job #{{ item.id }} on {{ tag }}</h1>
+<ul>
+<li>App Name: {{ item.app }}</li>
+<li>Function: {{ item.function}}</li>
+<li>Start Time: {{ item.time }}</li>
+<li>Job Type: {{ item.pipeline }}</li>
+</ul>
+<b>Report</b>
+<pre>{{ item.report }}</pre>
+</div>
+{% end %}
+{% else %} not found
+{% end %}
+</div>
+</body>
+</html>

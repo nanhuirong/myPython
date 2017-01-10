@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+<!--include file="cp_index.html"-->
+<html>
+<head>
+</head>
+<body>
+{% extends "cp_index.html" %}
+{% block body %}
+<table cellpadding="3" cellspacing="0" border="0" style="width: 67%; margin: 0 auto 2em auto;">
+   <tbody>
+            <tr id="filter_global">
+                <td>Global search</td>
+                <td align="center"><input type="text" class="global_filter" id="global_filter"></td>
+                <td align="center"><input type="checkbox" class="global_filter" id="global_regex" checked="checked"></td>
+                <td align="center"><input type="checkbox" class="global_filter" id="global_smart" checked="checked"></td>
+            </tr>
+      </tbody>
+</table>
+<table id="example" class="display nowrap" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>app</th>
+                <th>function</th>
+                <th>time</th>
+                <th>scrape_input</th>
+                <th>cp_output</th>
+                <th>scrape_invalid</th>
+                <th>cp_invalid</th>
+                <th>iibe_input</th>
+                <th>iibe_output</th>
+                <th>iibe_invalid</th>
+                <th>dv_input</th>
+                <th>dv_output</th>
+                <th>dv_invalid</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td id="{{ item.app }}"><a href="/envs/{{ tag }}/pipeline/{{ item.app }}">{{ item.app }}</a></td>
+                <td id="{{ item.app }}{{ item.function }}"><a href="/envs/{{ tag }}/pipeline/{{ item.app }}/{{ item.function }}">{{ item.function }}</a></td>
+                <td>{{ item.time }}</td>
+                <td><a href="/envs/{{ tag }}/jobs/contentPipeline/{{ item.uri }}">{{ int(item.scrape_input_count) }}</a></td>
+                <td>{{ int(item.scrape_output_count) }}</td>
+                <td>{{ int(item.scrape_invalid_count) }}</td>
+                <td>{{ int(item.cp_invalid_count) }}</td>
+                <td><a href="/envs/{{ tag }}/jobs/iibeEtlPipeline/{{ item.uri}}">{{ int(item.iibe_input_count) }}</a></td>
+                <td>{{ int(item.iibe_output_count) }}</td>
+                <td>{{ int(item.iibe_invalid_count) }}</td>
+                <td><a href="/envs/{{ tag }}/jobs/dvEtlPipeline/{{ item.uri }}">{{ int(item.dv_input_count) }}</a></td>
+                <td>{{ int(item.dv_output_count) }}</td>
+                <td>{{ int(item.dv_invalid_count) }}</td>
+            </tr>
+             {% end %}
+         </tbody>
+</table>
+<script>
+function filterGlobal () {
+    $('#example').DataTable().search(
+        $('#global_filter').val(),
+        //true,
+        //true
+        $('#global_regex').prop('checked'),
+        $('#global_smart').prop('checked')
+    ).draw();
+}
+$(document).ready(function() {
+    $('#example').DataTable( {
+        "scrollX": true,
+        "lengthMenu": [[-1,100,50,10], ["All",100,50,10]],
+       "createdRow": function ( row, data, index ) {
+            var scrapeInput=parseInt(data[3].replace(/<.*?>/g,""));
+            var cpInput=parseInt(data[4])+parseInt(data[6]);
+            var iibeInput=parseInt(data[7].replace(/<.*?>/g,""));
+            var iibeInput=parseInt(data[10].replace(/<.*?>/g,""));
+            var rate=0.1;
+            if ( parseInt(data[4]) < 100) {
+                $('td', row).eq(4).addClass('highlight');
+                $('td', row).eq(2).addClass('highlight');
+            }else if ( parseInt(data[8]) < 100) {
+                $('td', row).eq(8).addClass('highlight');
+                $('td', row).eq(2).addClass('highlight');
+            }else if ( parseInt(data[11]) < 100) {
+                $('td', row).eq(11).addClass('highlight');
+                $('td', row).eq(2).addClass('highlight');
+            }else if ( parseInt(data[5])/scrapeInput > rate) {
+                $('td', row).eq(5).addClass('highlight');
+                $('td', row).eq(2).addClass('highlight');
+            }else if ( parseInt(data[6])/cpInput > rate) {
+                $('td', row).eq(6).addClass('highlight');
+                $('td', row).eq(2).addClass('highlight');
+            }
+           //else{alert(parseInt(data[5])/scrapeInput);}
+        }
+});
+$('input.global_filter').on( 'keyup click', function () {
+        filterGlobal();
+    } );
+} );
+
+</script>
+{% end %}
+</body>
+</html>
+

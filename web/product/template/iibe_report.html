@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Phoenix Content Portal</title>
+    <link rel="stylesheet" href="/static/pure-min-0.6.0.css">
+    <link rel="stylesheet" href="/static/site.css">
+</head>
+<body>
+<div class="menu">
+<div class="pure-menu pure-menu-horizontal">
+<a href="/" class="pure-menu-heading pure-menu-link">Content Portal</a>
+<ul class="menu-list pure-menu-list">
+<li class="pure-menu-item"><a href="/envs/{{ tag }}/pipelines/cp{{ suffix }}" class="pure-menu-link">Content Pipeline</a></li>
+<li class="pure-menu-item pure-menu-selected"><a href="/envs/{{ tag }}/pipelines/iibe{{ suffix }}" class="pure-menu-link">IIBE ETL Pipeline</a></li>
+<li class="pure-menu-item"><a href="/envs/{{ tag }}/pipelines/dv{{ suffix }}" class="pure-menu-link">DV ETL Pipeline</a></li>
+</ul>
+</div>
+</div>
+<table class="main pure-table pure-table-bordered">
+<thead>
+<tr>
+<td width="150px">App</td>
+<td width="150px">Function</td>
+<td width="150px">Time</td>
+<td width="120px">Input Count</td>
+<td width="120px">Output Count</td>
+<td width="120px">IIBE Invalid</td>
+</tr>
+</thead>
+<tbody>
+{% for item in items %}
+<tr>
+{% if item.func_count > 0 %}
+<td width="150px" rowspan="{{ item.func_count }}"><a class="link-cell" href="/envs/{{ tag }}/pipelines/iibe/{{ item.app }}">{{ item.app }}</a></td>
+<td width="150px" rowspan="{{ item.func_count }}"><a class="link-cell" href="/envs/{{ tag }}/pipelines/iibe/{{ item.app }}/{{ item.function }}">{{ item.function}}</a></td>
+{% end %}
+<td width="150px"><a class="link-cell" href="/envs/{{ tag }}/jobs/{{ item.id }}">{{ item.time }}</a></td>
+<td width="120px"><a class="link-cell" href="http://kircher.stage.quixey.com/cloud/url?url={{ item.input_uri }}">{{ item.input_count }}</a></td>
+<td width="120px"><a class="link-cell" href="http://kircher.stage.quixey.com/cloud/url?url={{ item.output_uri }}">{{ item.output_count }}</a></td>
+<td width="120px"><a class="link-cell" href="http://kircher.stage.quixey.com/cloud/url?url={{ item.iibe_invalid_uri }}">{{ item.iibe_invalid_count }}</a></td>
+</tr>
+{% end %}
+</tbody>
+</table>
+</body>
+</html>

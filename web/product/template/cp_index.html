@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style type="text/css">
+td.highlight {
+        font-weight: bold;
+        color: red;
+    }
+div.dataTables_wrapper {
+        width: 80%;
+        margin: 0 auto;
+    }
+</style>
+<style>
+body{TEXT-ALIGN: center;}
+#center{ MARGIN-RIGHT: auto;
+MARGIN-LEFT: auto;
+height:200px;
+background:#F00;
+width:80%;
+vertical-align:middle;
+line-height:200px;
+}
+</style>
+<style>
+  #popView{
+  /*左侧弹出窗口的长宽、圆角、背景颜色*/
+  height: 400px;
+  width: 140px;
+
+
+  /*布局排版*/
+  position:absolute;
+  z-index:2;
+  top:20px
+  left:-0px;
+
+  /*字体设置*/
+  text-align: center;
+}
+</style>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>Dashboard Template for Bootstrap</title>
+    <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="http://getbootstrap.com/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+    <link href="http://getbootstrap.com/examples/dashboard/dashboard.css" rel="stylesheet">
+    <script type="text/javascript" src="/static/datatable/jquery-1.12.4.min.js"></script>
+    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/static/datatable/media/css/jquery.dataTables.min.css">
+    <script type="text/javascript" src="/static/datatable/jquery-1.12.4.min.js"></script>
+    <script type="text/javascript" src="/static/datatable/media/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="/static/hcharts/highcharts.js"></script>
+    <script type="text/javascript" src="/static/hcharts/exporting.js"></script>
+</head>
+<body>
+<div class="container-fluid">
+      <div class="row">
+        <div id="popView" class="col-sm-2 col-md-1 sidebar">
+          <ul class="nav nav-sidebar">
+            <!--li class="active"><a href="#">Content Pipepline Overview <span class="sr-only">(current)</span></a></li-->
+            <li ><a><strong>prod03</strong></a></li>
+            <li ><a href="/envs/prod03/pipeline">Latest_Pipeline</a></li>
+            <li ><a href="/envs/prod03/chart">All_Pipelines</a></li>
+            <li ><a href="/envs/prod03/cpStatistics">CP_Statistics</a></li>
+
+          </ul>
+          <ul class="nav nav-sidebar">
+            <li ><a><strong>stage03</strong></a></li>
+            <li ><a href="/envs/stage03/pipeline">Latest_Pipeline</a></li>
+            <li ><a href="/envs/stage03/chart">All_Pipelines</a></li>
+            <li ><a href="/envs/stage03/cpStatistics">CP_Statistics</a></li>
+          </ul>
+          <ul class="nav nav-sidebar">
+            <li ><a><strong>Staticstage03</strong></a></li>
+            <li ><a href="/envs/staticstage03/pipeline">Latest_Pipeline</a></li>
+            <li ><a href="/envs/staticstage03/chart">All_Pipelines</a></li>
+            <li ><a href="/envs/staticstage03/cpStatistics">CP_Statistics</a></li>
+          </ul>
+        </div>
+      <div id="content",class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+      {% block body %}<h>dddddd</h>{% end %}
+      </div>
+      </div>
+</div>
+<script>
+$(document).ready(function() {
+$(window).scroll(function() {
+var top = $(window).scrollTop()+200;
+$("#popView").css({  top: top + "px" });
+});
+});
+</script>
+<!--script>
+$(document).ready(function(){
+    var isHiden = true; /*控制切换菜单*/
+  $('#popView').hover(function(){
+                    if(isHiden){
+                    $('#popView').animate({left:'+=180px'});//菜单块向右移动
+                    isHiden = !isHiden; }
+                      },function(){
+                              if(!isHiden){
+                          $('#popView').animate({left:'-=180px'});//菜单块向右移动
+                          isHiden = !isHiden; 
+                          }}); 
+});
+
+</script-->
+<!--script language="javascript" type="text/javascript">
+ function jump(){
+  $("#content").load("envs/stage03/test");}
+var prod03_cpStatistics = document.getElementById('prod03_cpStatistics'); 
+prod03_cpStatistics.addEventListener('click',jump,false);   
+var stage03_cp = document.getElementById('stage03_cp');
+stage03_cp.addEventListener('click',function(){$("#content").load("/envs/stage03/cp")},false); 
+var stage03_cpStatistics = document.getElementById('stage03_cpStatistics');
+stage03_cpStatistics.addEventListener('click',function(){$("#content").load("/envs/stage03/test")},false); 
+</script-->
+</body>
+</html>
+
