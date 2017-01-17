@@ -17,6 +17,43 @@
             </tr>
       </tbody>
 </table>
+<table>
+    <thead>
+        <th>name</th>
+        <th>green</th>
+        <th>yellow</th>
+        <th>red</th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>totalApps</td>
+            <td>{{ total['totalApp']['green'] }}</td>
+            <td>{{ total['totalApp']['yellow'] }}</td>
+            <td>{{ total['totalApp']['red'] }}</td>
+        </tr>
+        <tr>
+            <td>totalFunctions</td>
+            <td>{{ total['totalFunction']['green'] }}</td>
+            <td>{{ total['totalFunction']['yellow'] }}</td>
+            <td>{{ total['totalFunction']['red'] }}</td>
+        </tr>
+    </tbody>
+</table>
+<script>
+    function filterGlobal () {
+    $('#example').DataTable().search(
+        $('#global_filter').val(),
+        //true,
+        //true
+        $('#global_regex').prop('checked'),
+        $('#global_smart').prop('checked')
+    ).draw();
+}
+$('input.global_filter').on( 'keyup click', function () {
+        filterGlobal();
+    } );
+} );
+</script>
 <table id="example" class="display nowrap" cellspacing="0" width="100%">
         <thead>
             <tr>
@@ -33,6 +70,7 @@
                 <th>dv_input</th>
                 <th>dv_output</th>
                 <th>dv_invalid</th>
+                <th>flag</th>
             </tr>
         </thead>
         <tbody>
@@ -51,6 +89,7 @@
                 <td><a href="/envs/{{ tag }}/jobs/dvEtlPipeline/{{ item.uri }}">{{ int(item.dv_input_count) }}</a></td>
                 <td>{{ int(item.dv_output_count) }}</td>
                 <td>{{ int(item.dv_invalid_count) }}</td>
+                <td>{{ int(item.flag) }}</td>
             </tr>
              {% end %}
          </tbody>
@@ -70,26 +109,34 @@ $(document).ready(function() {
         "scrollX": true,
         "lengthMenu": [[-1,100,50,10], ["All",100,50,10]],
        "createdRow": function ( row, data, index ) {
-            var scrapeInput=parseInt(data[3].replace(/<.*?>/g,""));
-            var cpInput=parseInt(data[4])+parseInt(data[6]);
-            var iibeInput=parseInt(data[7].replace(/<.*?>/g,""));
-            var iibeInput=parseInt(data[10].replace(/<.*?>/g,""));
-            var rate=0.1;
-            if ( parseInt(data[4]) < 100) {
-                $('td', row).eq(4).addClass('highlight');
-                $('td', row).eq(2).addClass('highlight');
-            }else if ( parseInt(data[8]) < 100) {
-                $('td', row).eq(8).addClass('highlight');
-                $('td', row).eq(2).addClass('highlight');
-            }else if ( parseInt(data[11]) < 100) {
-                $('td', row).eq(11).addClass('highlight');
-                $('td', row).eq(2).addClass('highlight');
-            }else if ( parseInt(data[5])/scrapeInput > rate) {
-                $('td', row).eq(5).addClass('highlight');
-                $('td', row).eq(2).addClass('highlight');
-            }else if ( parseInt(data[6])/cpInput > rate) {
-                $('td', row).eq(6).addClass('highlight');
-                $('td', row).eq(2).addClass('highlight');
+            <!--var scrapeInput=parseInt(data[3].replace(/<.*?>/g,""));-->
+            <!--var cpInput=parseInt(data[4])+parseInt(data[6]);-->
+            <!--var iibeInput=parseInt(data[7].replace(/<.*?>/g,""));-->
+            <!--var iibeInput=parseInt(data[10].replace(/<.*?>/g,""));-->
+            <!--var rate=0.1;-->
+            <!--if ( parseInt(data[4]) < 100) {-->
+                <!--$('td', row).eq(4).addClass('highlight');-->
+                <!--$('td', row).eq(2).addClass('highlight');-->
+            <!--}else if ( parseInt(data[8]) < 100) {-->
+                <!--$('td', row).eq(8).addClass('highlight');-->
+                <!--$('td', row).eq(2).addClass('highlight');-->
+            <!--}else if ( parseInt(data[11]) < 100) {-->
+                <!--$('td', row).eq(11).addClass('highlight');-->
+                <!--$('td', row).eq(2).addClass('highlight');-->
+            <!--}else if ( parseInt(data[5])/scrapeInput > rate) {-->
+                <!--$('td', row).eq(5).addClass('highlight');-->
+                <!--$('td', row).eq(2).addClass('highlight');-->
+            <!--}else if ( parseInt(data[6])/cpInput > rate) {-->
+                <!--$('td', row).eq(6).addClass('highlight');-->
+                <!--$('td', row).eq(2).addClass('highlight');-->
+            <!--}-->
+            var flag = parseInt(data[13]);
+            if (flag == 1){
+                $('td', row).eq(0).children('a').addClass('green');
+            }else if(flag == 2){
+                $('td', row).eq(0).children('a').addClass('yellow');
+            }else{
+                $('td', row).eq(0).children('a').addClass('red');
             }
            //else{alert(parseInt(data[5])/scrapeInput);}
         }

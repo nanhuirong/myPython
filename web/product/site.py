@@ -6,6 +6,7 @@ import tornado.options
 import tornado.web
 import torndb
 import json
+import datetime
 from tornado.options import define, options
 #定义全局变量
 define("port", default=9000, help="listen on the given port", type=int)
@@ -102,6 +103,9 @@ class cpStatisticsHandler(BaseHandler):
 class pipelineHandler(BaseHandler):
     def get (self,env,app=None,function=None):
         limit = LIMIT_IN_FUNCTION_LIST if app and function else LIMIT_IN_APP_LIST if app else LIMIT_IN_FULL_LIST
+        # print(env)
+        # print(app)
+        # print(function)
         suffix = "/%s/%s" % (app, function) if app and function else "/%s" % app if app else ""
         #env="stage03"
         tableName="report_"+env
@@ -111,7 +115,8 @@ class pipelineHandler(BaseHandler):
             where = where + " and app='%s'" % app
         if function:
             where = where + " and function='%s'" % function
-        print(where)
+        # print(where)
+        # print(tableName)
         sql_query=(
                       "SELECT app,function,time,uri, "
                       "scrape_input_count,scrape_output_count,scrape_invalid_count,"
@@ -210,8 +215,11 @@ class pipelineHandler(BaseHandler):
         try:
             self.db.execute("set @num := 0, @app := '', @function := '';")
             entries=self.db.query(sql_query)
-            #calc_function_rowspan(entries)
-            self.render("pipeline.html", items=entries, tag=env, suffix=suffix)
+            setFlag(entries)
+            total = {}
+            total['totalApp'] = {"green": 0, "yellow": 0, "red": 0}
+            total['totalFunction'] = {"green": 10, "yellow": 10, "red": 10}
+            self.render("pipeline.html", items=entries, tag=env, suffix=suffix, total=total)
         except Exception, e:
             print(Exception)
             print(e)
@@ -314,6 +322,9 @@ class chartHandler(BaseHandler):
             #self.db.execute("set @num := 0, @app := '', @function := '';")
             #self.db.execute("SET [SESSION | GLOBAL] group_concat_max_len = 15;")
             entries=self.db.query(sql_query)
+            setFlag(entries)
+            # entries = setFlag(entries)
+            # print entries
             #calc_function_rowspan(entries)
             self.render("chart.html", items=entries, tag=env, suffix=suffix)
         except Exception, e:
@@ -340,12 +351,61 @@ class PipelineJobHandler(BaseHandler):
         try:
             entries=self.db.query(sql_query)
             print(entries)
+            # print(entries[0])
             if entries:
                 for i in entries:
                     i["report"] = json.dumps(json.loads(i["report"]), indent=4, sort_keys=True)
             self.render("cp_report.html", items=entries, tag=env)
         except:
             print("read sql error")
+
+
+def filter(entries):
+    list = []
+    now = datetime.datetime.now()
+    print(entries)
+    for index in entries:
+        # jsonData = json.loads(index)
+        time = index["time"]
+        if (now -time).days < 14:
+            print((now -time).days)
+            list.append(index)
+    return list
+
+
+def setFlag(entries):
+    list = []
+    now = datetime.datetime.now()
+    record = {}
+    for index in entries:
+        # print("-------------")
+        app = index['app']
+        function = index['function']
+        time = index['time']
+        scrape_input = index['scrape_input_count']
+        cpValid = scrape_input - index['cp_invalid_count']
+        cpInvalid = index['cp_invalid_count']
+        if (now - time).days > 7 or (record.has_key(app) and record[app] == 3) or scrape_input == 0:
+            if not record.has_key(app + '|' + function):
+                record[app + '|' + function] = 3
+            if record.has_key(app) and record[app] != 3 or scrape_input == 0:
+                record[app] = 3
+        elif cpValid / scrape_input < 0.9 or (record.has_key(app) and record[app] == 2):
+            if not record.has_key(app + '|' + function):
+                record[app + '|' + function] = 2
+            if record.has_key(app) and record[app] != 2:
+                record[app] = 2
+        else:
+            if not record.has_key(app + '|' + function):
+                record[app + '|' + function] = 1
+    for index in entries:
+        index['flag'] = record[index['app'] + '|' + index['function']]
+    return list
+
+
+
+
+
 
 def main():
     tornado.options.parse_command_line()
