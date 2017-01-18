@@ -215,10 +215,11 @@ class pipelineHandler(BaseHandler):
         try:
             self.db.execute("set @num := 0, @app := '', @function := '';")
             entries=self.db.query(sql_query)
-            setFlag(entries)
+            # setFlag(entries)
             total = {}
-            total['totalApp'] = {"green": 0, "yellow": 0, "red": 0}
-            total['totalFunction'] = {"green": 10, "yellow": 10, "red": 10}
+            total['totalApp'] = {"1": 0, "2": 0, "3": 0}
+            total['totalFunction'] = {"1": 0, "2": 0, "3": 0}
+            setFlag(entries, total)
             self.render("pipeline.html", items=entries, tag=env, suffix=suffix, total=total)
         except Exception, e:
             print(Exception)
@@ -373,33 +374,42 @@ def filter(entries):
     return list
 
 
-def setFlag(entries):
+def setFlag(entries, total):
     list = []
     now = datetime.datetime.now()
     record = {}
     for index in entries:
-        # print("-------------")
         app = index['app']
         function = index['function']
         time = index['time']
         scrape_input = index['scrape_input_count']
         cpValid = scrape_input - index['cp_invalid_count']
         cpInvalid = index['cp_invalid_count']
-        if (now - time).days > 7 or (record.has_key(app) and record[app] == 3) or scrape_input == 0:
-            if not record.has_key(app + '|' + function):
-                record[app + '|' + function] = 3
-            if record.has_key(app) and record[app] != 3 or scrape_input == 0:
+        if (now - time).days > 7 or scrape_input == 0:
+            record[app + '|' + function] = 3
+            if not record.has_key(app) or record[app] <= 3:
                 record[app] = 3
-        elif cpValid / scrape_input < 0.9 or (record.has_key(app) and record[app] == 2):
-            if not record.has_key(app + '|' + function):
-                record[app + '|' + function] = 2
-            if record.has_key(app) and record[app] != 2:
+        elif cpValid / scrape_input < 0.9:
+            record[app + '|' + function] = 2
+            if not record.has_key(app) or record[app] <= 2:
                 record[app] = 2
         else:
-            if not record.has_key(app + '|' + function):
-                record[app + '|' + function] = 1
+            record[app + '|' + function] = 1
+            if not record.has_key(app) or record[app] <= 1:
+                record[app] = 1
+
+    app = ""
     for index in entries:
-        index['flag'] = record[index['app'] + '|' + index['function']]
+        index['flag'] = record[index['app']]
+        index['funcFlag'] = record[index['app'] + '|' + index['function']]
+        flag = str(index['flag'])
+        funcFlag = str(index['funcFlag'])
+        if index['app'] != app:
+            total['totalApp'][flag] += 1
+            app = index['app']
+        total['totalFunction'][funcFlag] += 1
+    total['totalApp']['count'] = total['totalApp']['1'] + total['totalApp']['2'] + total['totalApp']['3']
+    total['totalFunction']['count'] = total['totalFunction']['1'] + total['totalFunction']['2'] + total['totalFunction']['3']
     return list
 
 

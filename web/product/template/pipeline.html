@@ -1,12 +1,39 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
     "http://www.w3.org/TR/html4/loose.dtd">
 <!--include file="cp_index.html"-->
-<html>
+<html xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
 <head>
 </head>
-<body>
+<br>
 {% extends "cp_index.html" %}
 {% block body %}
+<table align="center">
+    <thead>
+    <th>&nbspNAME&nbsp</th>
+    <th>&nbspCOUNT&nbsp</th>
+    <th>&nbspGREEEN&nbsp</th>
+    <th>&nbspYELLOW&nbsp</th>
+    <th>RED</th>
+    </thead>
+    <tr>
+        <td>total&nbspApps</td>
+        <td>{{ total['totalApp']['count'] }}</td>
+        <td>{{ total['totalApp']['1'] }}</td>
+        <td>{{ total['totalApp']['2'] }}</td>
+        <td>{{ total['totalApp']['3'] }}</td>
+    </tr>
+    <tr>
+        <td>total&nbspFunctions</td>
+        <td>{{ total['totalFunction']['count']}}</td>
+        <td>{{ total['totalFunction']['1'] }}</td>
+        <td>{{ total['totalFunction']['2'] }}</td>
+        <td>{{ total['totalFunction']['3'] }}</td>
+    </tr>
+    </tbody>
+</table>
+<p><br>*Green: Everything is okay, data updated within 7 days<br>
+*Yellow: data updated within 7 days, but scrape data has less than 90% passed pipeline check<br>
+*Red: data updated beyond 7 days</p>
 <table cellpadding="3" cellspacing="0" border="0" style="width: 67%; margin: 0 auto 2em auto;">
    <tbody>
             <tr id="filter_global">
@@ -17,43 +44,6 @@
             </tr>
       </tbody>
 </table>
-<table>
-    <thead>
-        <th>name</th>
-        <th>green</th>
-        <th>yellow</th>
-        <th>red</th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>totalApps</td>
-            <td>{{ total['totalApp']['green'] }}</td>
-            <td>{{ total['totalApp']['yellow'] }}</td>
-            <td>{{ total['totalApp']['red'] }}</td>
-        </tr>
-        <tr>
-            <td>totalFunctions</td>
-            <td>{{ total['totalFunction']['green'] }}</td>
-            <td>{{ total['totalFunction']['yellow'] }}</td>
-            <td>{{ total['totalFunction']['red'] }}</td>
-        </tr>
-    </tbody>
-</table>
-<script>
-    function filterGlobal () {
-    $('#example').DataTable().search(
-        $('#global_filter').val(),
-        //true,
-        //true
-        $('#global_regex').prop('checked'),
-        $('#global_smart').prop('checked')
-    ).draw();
-}
-$('input.global_filter').on( 'keyup click', function () {
-        filterGlobal();
-    } );
-} );
-</script>
 <table id="example" class="display nowrap" cellspacing="0" width="100%">
         <thead>
             <tr>
@@ -109,27 +99,27 @@ $(document).ready(function() {
         "scrollX": true,
         "lengthMenu": [[-1,100,50,10], ["All",100,50,10]],
        "createdRow": function ( row, data, index ) {
-            <!--var scrapeInput=parseInt(data[3].replace(/<.*?>/g,""));-->
-            <!--var cpInput=parseInt(data[4])+parseInt(data[6]);-->
-            <!--var iibeInput=parseInt(data[7].replace(/<.*?>/g,""));-->
-            <!--var iibeInput=parseInt(data[10].replace(/<.*?>/g,""));-->
-            <!--var rate=0.1;-->
-            <!--if ( parseInt(data[4]) < 100) {-->
-                <!--$('td', row).eq(4).addClass('highlight');-->
-                <!--$('td', row).eq(2).addClass('highlight');-->
-            <!--}else if ( parseInt(data[8]) < 100) {-->
-                <!--$('td', row).eq(8).addClass('highlight');-->
-                <!--$('td', row).eq(2).addClass('highlight');-->
-            <!--}else if ( parseInt(data[11]) < 100) {-->
-                <!--$('td', row).eq(11).addClass('highlight');-->
-                <!--$('td', row).eq(2).addClass('highlight');-->
-            <!--}else if ( parseInt(data[5])/scrapeInput > rate) {-->
-                <!--$('td', row).eq(5).addClass('highlight');-->
-                <!--$('td', row).eq(2).addClass('highlight');-->
-            <!--}else if ( parseInt(data[6])/cpInput > rate) {-->
-                <!--$('td', row).eq(6).addClass('highlight');-->
-                <!--$('td', row).eq(2).addClass('highlight');-->
-            <!--}-->
+            var scrapeInput=parseInt(data[3].replace(/<.*?>/g,""));
+            var cpInput=parseInt(data[4])+parseInt(data[6]);
+            var iibeInput=parseInt(data[7].replace(/<.*?>/g,""));
+            var iibeInput=parseInt(data[10].replace(/<.*?>/g,""));
+            var rate=0.1;
+            if ( parseInt(data[4]) < 100) {
+                $('td', row).eq(4).addClass('highlight');
+                $('td', row).eq(2).addClass('highlight');
+            }else if ( parseInt(data[8]) < 100) {
+                $('td', row).eq(8).addClass('highlight');
+                $('td', row).eq(2).addClass('highlight');
+            }else if ( parseInt(data[11]) < 100) {
+                $('td', row).eq(11).addClass('highlight');
+                $('td', row).eq(2).addClass('highlight');
+            }else if ( parseInt(data[5])/scrapeInput > rate) {
+                $('td', row).eq(5).addClass('highlight');
+                $('td', row).eq(2).addClass('highlight');
+            }else if ( parseInt(data[6])/cpInput > rate) {
+                $('td', row).eq(6).addClass('highlight');
+                $('td', row).eq(2).addClass('highlight');
+            }
             var flag = parseInt(data[13]);
             if (flag == 1){
                 $('td', row).eq(0).children('a').addClass('green');
